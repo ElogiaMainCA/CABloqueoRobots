@@ -2,7 +2,7 @@
 
 ## 1. Introducción
 
-El presente reporte detalla las URLs que están siendo bloqueadas por el archivo robots.txt del sitio web cyamoda.com. Se analizan las causas del bloqueo, el impacto SEO que esto puede generar y se proponen soluciones detalladas con ejemplos claros para corregir estos problemas.
+El presente reporte detalla las URLs que están siendo bloqueadas por el archivo robots.txt del sitio web cyamoda.com. Se analizan las causas del bloqueo, el impacto SEO que esto puede generar y se proponen soluciones con alternativas en caso de que la solución principal no pueda aplicarse. Dichas soluciones vienen completamente detalladas con ejemplos claros para corregir estos problemas 
 
 ## 2. Análisis del robots.txt
 
@@ -16,7 +16,22 @@ Disallow: /update/*
 
 Impacto:
 
-Esta regla bloquea todas las URLs que contienen /update/, lo que impide que Google acceda a páginas de categorías y productos dinámicos que dependen de esta estructura.
+Bloquea el acceso a categorías y productos dinámicos, lo que puede afectar la indexación y visibilidad en Google.
+
+Solución principal:
+
+Modificar la regla para permitir categorías importantes:
+
+Disallow: /update/*
+Allow: /update/?cgid=NINOS_ULTIMAS_TENDENCIAS*
+
+Solución alternativa:
+
+Si no es posible modificar robots.txt, asegurarse de que las páginas tengan etiquetas rel="canonical" apuntando a la versión limpia:
+
+<link rel="canonical" href="https://www.cya.com/ninos/ultimas-tendencias/">
+
+Además, se recomienda revisar la configuración de los sitemaps para garantizar que estas páginas importantes estén incluidas.
 
 Ejemplo de URL bloqueada:
 
@@ -32,9 +47,20 @@ Disallow: /search/*
 
 Impacto:
 
-Impide que las páginas de búsqueda interna sean indexadas, lo cual es una práctica recomendada para evitar contenido duplicado y reducir el rastreo innecesario.
+Evita la indexación de páginas de búsqueda interna. Recomendado en general, pero puede afectar tráfico orgánico si generan visitas relevantes.
 
-Sin embargo, si las páginas de búsqueda están generando tráfico orgánico, este bloqueo podría afectar su rendimiento en SEO.
+Solución principal:
+
+Mantener el bloqueo si no hay tráfico orgánico importante.
+
+Solución alternativa:
+
+Si las páginas de búsqueda generan tráfico relevante, se puede permitir la indexación selectiva agregando meta robots a las páginas específicas:
+
+<meta name="robots" content="index, follow">
+
+También se sugiere analizar en Google Analytics si estas páginas han generado conversiones o tráfico de calidad antes de tomar una decisión definitiva.
+
 
 ### 2.3. Bloqueo de /on/demandware.store/
 
@@ -54,7 +80,26 @@ https://www.cyamoda.com/on/demandware.store/Sites-Cya_MX-Site/es_MX/Product-Vari
 
 Problema:
 
-Se han detectado múltiples URLs que terminan en /null, lo que indica un posible error en la generación de enlaces dentro del sitio.
+Errores en la generación de enlaces producen URLs inválidas con /null.
+
+Solución principal:
+
+Identificar la causa en el CMS y corregir la estructura de generación de URLs.
+
+Implementar redirecciones 301:
+
+RedirectMatch 301 ^(.*)/null$ $1
+
+Solución alternativa:
+
+Si no es posible corregir el origen del error de inmediato, bloquear temporalmente en robots.txt:
+
+Disallow: */null
+
+Además, monitorear con Google Search Console y Screaming Frog.
+
+Para un análisis más detallado, se recomienda realizar pruebas en entornos de desarrollo antes de aplicar cualquier cambio en producción.
+
 
 Ejemplo de URLs afectadas:
 
@@ -66,15 +111,16 @@ Esto puede generar contenido de baja calidad para los motores de búsqueda y afe
 
 ## 3. Impacto SEO del Bloqueo de Estas URLs
 
-Disminución en la indexación de productos y categorías
+Disminución en la indexación de productos y categorías: Google no podrá rastrear ciertas páginas clave.
 
-Google no puede acceder a páginas de productos y categorías, lo que reduce la posibilidad de que aparezcan en los resultados de búsqueda.
+Aumento de páginas huérfanas: Las URLs bloqueadas podrían quedar sin enlaces internos relevantes.
 
-Las páginas de productos pueden quedar fuera del índice de Google, afectando el tráfico orgánico.
+Impacto en conversión: Menos visibilidad puede llevar a menos tráfico y ventas.
 
-Aumento del número de páginas huérfanas
+Errores de rastreo: URLs con /null pueden generar señales de baja calidad.
 
-Si las URLs bloqueadas no tienen enlaces internos adecuados, pueden convertirse en páginas huérfanas que no son rastreadas ni indexadas.
+Se recomienda realizar una auditoría de enlazado interno para mitigar los efectos de estos bloqueos.
+
 
 Posible impacto en la conversión
 
@@ -82,27 +128,20 @@ Si las páginas de categorías y productos no aparecen en Google, los usuarios n
 
 Generación de errores en rastreo
 
-URLs con /null pueden generar problemas de rastreo y señales de baja calidad para los motores de búsqueda.
 
 ## 4. Propuesta de Solución
 
 ### 4.1. Modificación del robots.txt
 
-Opción 1: Permitir indexación selectiva de /update/
-
-Si algunas URLs bajo /update/ contienen contenido relevante, se puede modificar la regla:
+Opción 1: Permitir indexación selectiva
 
 Disallow: /update/*
 Allow: /update/?cgid=NINOS_ULTIMAS_TENDENCIAS*
 
-Esto permitirá la indexación de categorías importantes.
+Opción 2: Uso de etiquetas canónicas
 
-Opción 2: Asegurar que las canónicas no apunten a /update/
+<link rel="canonical" href="https://www.cya.com/ninos/ultimas-tendencias/">
 
-Si /update/ solo se usa para filtros y paginación, es importante que las páginas tengan etiquetas rel="canonical" apuntando a la versión limpia.
-Ejemplo:
-
-<link rel="canonical" href="https://www.cyamoda.com/ninos/ultimas-tendencias/">
 
 ### 4.2. Corrección de URLs con /null
 
@@ -123,6 +162,8 @@ RedirectMatch 301 ^(.*)/null$ $1
 Revisión en Google Search Console
 
 Analizar el informe de cobertura y corregir cualquier URL afectada.
+
+
 
 ### 4.3. Verificación y seguimiento
 
