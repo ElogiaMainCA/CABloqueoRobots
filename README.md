@@ -4,7 +4,7 @@
 
 El presente reporte detalla las URLs que están siendo bloqueadas por el archivo robots.txt del sitio web cyamoda.com. Se analizan las causas del bloqueo, el impacto SEO que esto puede generar y se proponen soluciones detalladas con ejemplos claros para corregir estos problemas.
 
-## 2. Análisis del robots.txt
+#### 2. Análisis del robots.txt
 
 El robots.txt de cyamoda.com contiene varias reglas que restringen el acceso de los motores de búsqueda a ciertas páginas. A continuación, se listan las reglas relevantes y su posible impacto:
 
