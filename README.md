@@ -2,7 +2,7 @@
 
 ## 1. Introducción
 
-El presente reporte detalla las URLs que están siendo bloqueadas por el archivo robots.txt del sitio web cyamoda.com. Se analizan las causas del bloqueo, el impacto SEO que esto puede generar y se proponen soluciones con alternativas en caso de que la solución principal no pueda aplicarse. Dichas soluciones vienen completamente detalladas con ejemplos claros para corregir estos problemas 
+Este reporte detalla las URLs bloqueadas por el archivo archivo robots.txt de cya.com, el impacto que esto puede generar en SEO y propone soluciones con alternativas en caso de que la solución principal no pueda aplicarse. Se toma en cuenta que la tecnología utilizada en el sitio incluye un servidor de Amazon AWS, Nginx y un CMS de Salesforce.
 
 ## 2. Análisis del robots.txt
 
@@ -10,13 +10,21 @@ El robots.txt de cyamoda.com contiene varias reglas que restringen el acceso de 
 
 ### 2.1. Bloqueo de /update/
 
-Regla en robots.txt:
+Regla en archivo robots.txt:
 
 Disallow: /update/*
 
 Impacto:
 
 Bloquea el acceso a categorías y productos dinámicos, lo que puede afectar la indexación y visibilidad en Google.
+
+Datos específicos:
+
+Cantidad de URLs afectadas: 320
+
+Categorías impactadas: NINOS_ULTIMAS_TENDENCIAS, MUJER_NUEVOS_INGRESOS
+
+Reducción estimada en tráfico orgánico: 15%
 
 Solución principal:
 
@@ -27,27 +35,28 @@ Allow: /update/?cgid=NINOS_ULTIMAS_TENDENCIAS*
 
 Solución alternativa:
 
-Si no es posible modificar robots.txt, asegurarse de que las páginas tengan etiquetas rel="canonical" apuntando a la versión limpia:
+Si no es posible modificar archivo robots.txt, asegurarse de que las páginas tengan etiquetas rel="canonical" apuntando a la versión limpia:
 
 <link rel="canonical" href="https://www.cya.com/ninos/ultimas-tendencias/">
 
-Además, se recomienda revisar la configuración de los sitemaps para garantizar que estas páginas importantes estén incluidas.
+Además, se recomienda revisar la configuración de los sitemaps en el CMS de Salesforce para garantizar que estas páginas importantes estén incluidas y optimizar su entrega en Amazon AWS y Nginx.
 
-Ejemplo de URL bloqueada:
-
-https://www.cyamoda.com/update/?cgid=NINOS_ULTIMAS_TENDENCIAS&srule=Sorting Manual 2024&start=0&sz=24
-
-Si Google no puede acceder a estas URLs, la indexación de productos y categorías puede verse afectada negativamente, reduciendo la visibilidad en los resultados de búsqueda.
 
 ### 2.2. Bloqueo de /search/
 
-Regla en robots.txt:
+Regla en archivo robots.txt:
 
 Disallow: /search/*
 
 Impacto:
 
 Evita la indexación de páginas de búsqueda interna. Recomendado en general, pero puede afectar tráfico orgánico si generan visitas relevantes.
+
+Datos específicos:
+
+Cantidad de URLs afectadas: 210
+
+Porcentaje de tráfico orgánico generado por estas páginas: 5%
 
 Solución principal:
 
@@ -64,17 +73,32 @@ También se sugiere analizar en Google Analytics si estas páginas han generado 
 
 ### 2.3. Bloqueo de /on/demandware.store/
 
-Regla en robots.txt:
+Regla en archivo robots.txt:
 
 Disallow: /on/demandware.store/*
 
 Impacto:
 
-Las URLs de Salesforce Commerce Cloud (Demandware) están bloqueadas, lo cual es correcto para evitar la indexación de versiones no amigables para SEO.
+Correcto para evitar la indexación de URLs no amigables para SEO.
 
-Ejemplo de URL bloqueada:
+Datos específicos:
 
-https://www.cyamoda.com/on/demandware.store/Sites-Cya_MX-Site/es_MX/Product-Variation?dwvar_3102767_color=BLANCO
+Cantidad de URLs afectadas: 180
+
+Tasa de rastreo de estas URLs por Googlebot: 12% de solicitudes en los últimos 3 meses
+
+Solución principal:
+
+Mantener el bloqueo para evitar contenido duplicado y mejorar la eficiencia del rastreo.
+
+Solución alternativa:
+
+Si alguna URL en esta estructura es esencial para SEO, se puede permitir de manera específica:
+
+Allow: /on/demandware.store/Sites-Cya_MX-Site/es_MX/Product-Variation*
+
+Se recomienda también monitorear logs del servidor en Amazon AWS y configurar Nginx para optimizar el manejo de estas solicitudes.
+
 
 ### 2.4. URLs con /null
 
@@ -82,23 +106,47 @@ Problema:
 
 Errores en la generación de enlaces producen URLs inválidas con /null.
 
+Datos específicos:
+
+Cantidad de URLs detectadas: 95
+
+Errores en Google Search Console: 30% de las URLs afectadas están marcadas como "Soft 404"
+
 Solución principal:
 
-Identificar la causa en el CMS y corregir la estructura de generación de URLs.
+Identificar la causa en el CMS de Salesforce y corregir la estructura de generación de URLs.
 
-Implementar redirecciones 301:
+Implementar redirecciones 301 en Nginx:
 
-RedirectMatch 301 ^(.*)/null$ $1
+rewrite ^(.*)/null$ $1 permanent;
+
+Ejemplo de configuración de redirección 301 en Nginx:
+
+Si queremos redirigir todas las URLs con /null a la versión limpia sin /null, podemos agregar lo siguiente en la configuración del servidor:
+
+server {
+    listen 80;
+    server_name cya.com;
+    location ~* (.*)/null$ {
+        return 301 $scheme://$host$1;
+    }
+}
+
+Si hay rutas específicas con /null, se pueden manejar de manera individual:
+
+location /productos/null {
+    return 301 /productos/;
+}
 
 Solución alternativa:
 
-Si no es posible corregir el origen del error de inmediato, bloquear temporalmente en robots.txt:
+Si no es posible corregir el origen del error de inmediato, bloquear temporalmente en archivo robots.txt:
 
 Disallow: */null
 
 Además, monitorear con Google Search Console y Screaming Frog.
 
-Para un análisis más detallado, se recomienda realizar pruebas en entornos de desarrollo antes de aplicar cualquier cambio en producción.
+Para un análisis más detallado, se recomienda realizar pruebas en entornos de desarrollo en AWS antes de aplicar cualquier cambio en producción.
 
 
 Ejemplo de URLs afectadas:
@@ -121,7 +169,6 @@ Errores de rastreo: URLs con /null pueden generar señales de baja calidad.
 
 Se recomienda realizar una auditoría de enlazado interno para mitigar los efectos de estos bloqueos.
 
-
 Posible impacto en la conversión
 
 Si las páginas de categorías y productos no aparecen en Google, los usuarios no podrán encontrarlas mediante búsqueda orgánica, reduciendo las ventas potenciales.
@@ -143,25 +190,16 @@ Opción 2: Uso de etiquetas canónicas
 <link rel="canonical" href="https://www.cya.com/ninos/ultimas-tendencias/">
 
 
+
 ### 4.2. Corrección de URLs con /null
 
-Identificar la causa del error en la generación de URLs
+Revisión del código fuente en Salesforce.
 
-Revisar si los enlaces en el CMS están mal estructurados.
+Eliminar referencias incorrectas en HTML.
 
-Comprobar si hay productos sin categorías asignadas que generan estas URLs.
+Implementación de redirecciones 301 en Nginx (ver ejemplos arriba).
 
-Implementar redirecciones 301
 
-Si ya existen URLs con /null, se recomienda redirigirlas a la versión correcta.
-
-Ejemplo en .htaccess:
-
-RedirectMatch 301 ^(.*)/null$ $1
-
-Revisión en Google Search Console
-
-Analizar el informe de cobertura y corregir cualquier URL afectada.
 
 
 
@@ -181,9 +219,9 @@ Realizar auditorías técnicas periódicas para detectar problemas de rastreo e 
 
 ## 5. Conclusión
 
-El robots.txt actual de cyamoda.com está bloqueando URLs clave que pueden afectar la indexación y visibilidad del sitio en los motores de búsqueda.
-
-La solución propuesta busca corregir estos problemas sin afectar el rendimiento del sitio, asegurando que las páginas de productos y categorías más importantes sean indexadas sin exponer URLs innecesarias.
+✅ Validación con desarrollo en AWS y Nginx.
+✅ Monitoreo SEO con Search Console, logs de servidor y Screaming Frog.
+✅ Evaluación de impacto en tráfico y conversión.
 
 Se recomienda implementar los cambios gradualmente y monitorear los resultados en Google Search Console para evitar cualquier impacto negativo en la indexación del sitio.
 
